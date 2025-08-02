@@ -7,20 +7,22 @@ import paginationView from './views/paginationView.js';
 import bookmarksView from './views/bookmarksView.js';
 import addRecipeView from './views/addRecipeView.js';
 
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
+import 'core-js/stable'; // Polyfill for missing JS features (ES6+)
+import 'regenerator-runtime/runtime'; // Polyfill async...await
 
+// Replace/update modules in the browser at runtime without a full page reload
+// Only in development mode
 // if (module.hot) {
 //   module.hot.accept();
 // }
 
 const controlRecipes = async function () {
   try {
-    const id = window.location.hash.slice(1);
+    const id = window.location.hash.slice(1); // The id is after the # in the url. Extract the id from: #id
 
-    if (!id) return;
+    if (!id) return; // If there is no hash in the url
 
-    recipeView.renderSpinner();
+    recipeView.renderSpinner(); // Show spinner in the recipe place
 
     // 0) Update results view to mark selected search result
 
@@ -110,7 +112,7 @@ const controlAddRecipe = async function (newRecipe) {
     // Render bookmark view
     bookmarksView.render(model.state.bookmarks);
 
-    // Change ID in URL
+    // Change ID in URL (without reloading the page)
     window.history.pushState(null, ``, `#${model.state.recipe.id}`);
 
     // Close form window
@@ -123,6 +125,9 @@ const controlAddRecipe = async function (newRecipe) {
   }
 };
 
+// Set all handlers to the Views
+// publisher - subscriber method
+// view - publisher, controller - subscriber
 const init = function () {
   bookmarksView.addHandlerRender(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes);

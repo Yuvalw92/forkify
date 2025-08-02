@@ -1,7 +1,10 @@
-import { async } from 'regenerator-runtime/runtime';
+import 'regenerator-runtime/runtime';
 import { API_URL, RES_PER_PAGE, KEY } from './config.js';
 // import { getJSON, sendJSON } from './helpers.js';
 import { AJAX } from './helpers.js';
+
+// State, manipulations on state and http requests
+
 export const state = {
   recipe: {},
   search: {
@@ -13,9 +16,11 @@ export const state = {
   bookmarks: [],
 };
 
+// Use the data from API in order to create recipe object with renamed properties
 const createRecipeObject = function (data) {
-  const { recipe } = data.data;
+  const { recipe } = data.data; // Destructuring recipe object
   return {
+    // Return new recipe object
     id: recipe.id,
     title: recipe.title,
     publisher: recipe.publisher,
@@ -24,10 +29,12 @@ const createRecipeObject = function (data) {
     servings: recipe.servings,
     cookingTime: recipe.cooking_time,
     ingredients: recipe.ingredients,
-    ...(recipe.key && { key: recipe.key }),
+    ...(recipe.key && { key: recipe.key }), // For user`s added recipes, add 'key' property
   };
 };
 
+// Get the id from the controller (after # in the url)
+// Get the recipe from API
 export const loadRecipe = async function (id) {
   try {
     if (!id) return;
@@ -35,6 +42,8 @@ export const loadRecipe = async function (id) {
     const data = await AJAX(`${API_URL}${id}?key=${KEY}`);
     state.recipe = createRecipeObject(data);
 
+    // Checking if this recipe included in user's bookmarks
+    // Creates bookmarked property to recipe (true or false)
     if (state.bookmarks.some(bookmark => bookmark.id === id))
       state.recipe.bookmarked = true;
     else state.recipe.bookmarked = false;
@@ -44,6 +53,7 @@ export const loadRecipe = async function (id) {
   }
 };
 
+// Get all the recipes which include the word in query
 export const loadSearchResults = async function (query) {
   try {
     const data = await AJAX(`${API_URL}?search=${query}&key=${KEY}`);
@@ -64,14 +74,18 @@ export const loadSearchResults = async function (query) {
   }
 };
 
+// Pagination
+// Array of results according to the page entered and the number of results in each page
 export const getSearchResultsPage = function (page = state.search.page) {
   state.search.page = page;
   const start = (page - 1) * state.search.resultsPerPage;
   const end = page * state.search.resultsPerPage;
 
-  return state.search.results.slice(start, end);
+  return state.search.results.slice(start, end); // slice get rid of the last result (0-9 instead of 0-10)
 };
 
+// Set new quantities for the ingredients according to the proportion of new servings to old servings
+// Set new number of servings
 export const updateServings = function (newServings) {
   state.recipe.ingredients.forEach(ing => {
     ing.quantity = (ing.quantity * newServings) / state.recipe.servings;
@@ -110,12 +124,14 @@ const init = function () {
 
 init();
 
+// Upload the new recipe to the API
 export const uploadRecipe = async function (newRecipe) {
   try {
     const ingredients = Object.entries(newRecipe)
       .filter(entry => entry[0].startsWith(`ingredient`) && entry[1] !== ``)
       .map(ing => {
         const ingArr = ing[1].split(`,`).map(el => el.trim());
+        // Check if ingredient consist quantity, unit and description
         if (ingArr.length !== 3)
           throw new Error(
             `Wrong ingedient format! Please use the correct format :)`

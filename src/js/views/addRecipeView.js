@@ -1,6 +1,7 @@
 import View from './View';
-import icons from 'url:../../img/icons.svg';
 
+// Recipe editor
+// The html template is in index.html (hidden by class)
 class AddRecipeView extends View {
   _parentElement = document.querySelector(`.upload`);
   _successMessage = `Recipe was successfully uploaded :)`;
@@ -20,6 +21,8 @@ class AddRecipeView extends View {
     this._overlay.classList.toggle(`hidden`);
     this._window.classList.toggle(`hidden`);
   }
+
+  // Bind connects 'this' to class instance and not to the button element
   _addHandlerShowWindow() {
     this._btnOpen.addEventListener(`click`, this.toggleWindow.bind(this));
   }
@@ -31,7 +34,7 @@ class AddRecipeView extends View {
   addHandlerUpload(handler) {
     this._parentElement.addEventListener(`submit`, function (e) {
       e.preventDefault();
-      const dataArr = [...new FormData(this)];
+      const dataArr = [...new FormData(this)]; // 'this' is connected to form
       const data = Object.fromEntries(dataArr);
       handler(data);
     });

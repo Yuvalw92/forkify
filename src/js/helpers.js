@@ -1,6 +1,7 @@
-import { async } from 'regenerator-runtime/runtime';
+import 'regenerator-runtime/runtime';
 import { TIMEOUT_SEC } from './config.js';
 
+// Timeout promise in seconds
 const timeout = function (s) {
   return new Promise(function (_, reject) {
     setTimeout(function () {
@@ -9,6 +10,7 @@ const timeout = function (s) {
   });
 };
 
+// Http request function: POST or GET
 export const AJAX = async function (url, uploadData = undefined) {
   try {
     const fetchPro = uploadData
@@ -20,7 +22,7 @@ export const AJAX = async function (url, uploadData = undefined) {
           body: JSON.stringify(uploadData),
         })
       : fetch(url);
-    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]); // Time limit for the response
     const data = await res.json();
     if (!res.ok) throw new Error(`${data.message} (${res.status})`);
     return data;
@@ -29,6 +31,7 @@ export const AJAX = async function (url, uploadData = undefined) {
   }
 };
 /*
+// Http request for GET method
 export const getJSON = async function (url) {
   try {
     const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
@@ -40,6 +43,7 @@ export const getJSON = async function (url) {
   }
 };
 
+// Http request for POST method
 export const sendJSON = async function (url, uploadData) {
   try {
     const fetchPro = fetch(url, {

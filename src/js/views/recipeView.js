@@ -1,5 +1,5 @@
 import View from './View.js';
-import icons from 'url:../../img/icons.svg';
+import icons from 'url:../../img/icons.svg'; // Access to icons.svg in Parcel version 2
 import { Fraction } from 'fractional';
 
 class RecipeView extends View {
@@ -7,13 +7,15 @@ class RecipeView extends View {
   _errorMessage = `we could not find the recipe. please try another one`;
   _successMessage = ``;
 
+  // Render the recipe on the screen (element with recipe class)
   render(data) {
-    this._data = data;
+    this._data = data; // Saves the data from model.state.recipe
     const markup = this._generateMarkup();
     this._clear();
     this._parentElement.insertAdjacentHTML(`afterbegin`, markup);
   }
 
+  // Show spinner when loading the recipe
   renderSpinner() {
     const markup = `<div class="spinner">
     <svg>
@@ -24,6 +26,7 @@ class RecipeView extends View {
     this._parentElement.insertAdjacentHTML(`afterbegin`, markup);
   }
 
+  // Render error message
   renderError(message = this._errorMessage) {
     const markup = `<div class="error">
     <div>
@@ -50,15 +53,20 @@ class RecipeView extends View {
     this._parentElement.insertAdjacentHTML(`afterbegin`, markup);
   }
 
+  // Activate the handler when # is changed in the url and when the page is loading (before changing the hash)
   addHandlerRender(handler) {
     [`hashchange`, `load`].forEach(ev => window.addEventListener(ev, handler));
   }
 
+  // Add handler to update the number of servings in recipe
+  // Delegation for targeting the button
+  // Get the number of serving to update to from data-update-to in the markup
   addHandlerUpdateServings(handler) {
     this._parentElement.addEventListener(`click`, function (e) {
       const btn = e.target.closest(`.btn--update-servings`);
       if (!btn) return;
       const updateTo = +btn.dataset.updateTo;
+      // no number of servings less the 1
       if (updateTo > 0) {
         handler(updateTo);
       }
@@ -73,6 +81,7 @@ class RecipeView extends View {
     });
   }
 
+  // Generate the recipe view
   _generateMarkup() {
     return `
     <figure class="recipe__fig">
@@ -164,6 +173,8 @@ class RecipeView extends View {
   </div>`;
   }
 
+  // Generate the recipe's ingredients view (one ingredient)
+  // Fraction is class form fraction library - it changes the decimal to fraction
   _generateMarkupIngredients(ing) {
     return `<li class="recipe__ingredient">
     <svg class="recipe__icon">
