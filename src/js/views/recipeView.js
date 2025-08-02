@@ -1,6 +1,6 @@
 import View from './View.js';
 import icons from 'url:../../img/icons.svg'; // Access to icons.svg in Parcel version 2
-import { Fraction } from 'fractional';
+import Fraction from 'fraction.js';
 
 class RecipeView extends View {
   _parentElement = document.querySelector(`.recipe`);
